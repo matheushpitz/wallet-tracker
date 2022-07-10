@@ -4,7 +4,7 @@
   "description": "wallet tracker",
   "main": "app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx jest",
     "build": "npx rimraf ./build && npx tsc",
     "start": "npm run build && node build/app.js",
     "dev": "nodemon"

@@ -9,7 +9,7 @@ export interface IDiscordMessageData {
 
 export interface IDiscordCommandListener {
     getOptions(interaction: any): { [key: string]: any };
-    onExecute(interaction: any, options: { [key: string]: any }, messageData: IDiscordMessageData): void;
+    onExecute(interaction: any, options: { [key: string]: any }, messageData: IDiscordMessageData): Promise<void>;
 }
 
 export interface IDiscordCommand {
@@ -52,7 +52,7 @@ export async function createClient(token: string, clientId: string, commands: ID
 
         const comm = commands.filter(c => c.command.name === interaction.commandName);
         if(comm.length > 0) {
-            comm[0].listener.onExecute(interaction, comm[0].listener.getOptions(interaction), {
+            await comm[0].listener.onExecute(interaction, comm[0].listener.getOptions(interaction), {
                 channelId: interaction.channelId,
                 userId: interaction.user.id
             });
@@ -65,7 +65,7 @@ export async function createClient(token: string, clientId: string, commands: ID
         const dCommands = commands.map(c => c.command.toJSON());
         const rest = new REST({ version: '10' }).setToken(token);
 
-        await rest.put(Routes.applicationCommands(clientId), { body: commands });
+        await rest.put(Routes.applicationCommands(clientId), { body: dCommands });
 
         console.log('Discord commands were registered successfully');
     } catch(err) {
