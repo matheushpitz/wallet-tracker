@@ -1,0 +1,29 @@
+{
+  "name": "wallet-tracker",
+  "version": "1.0.0",
+  "description": "wallet tracker",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx rimraf ./build && npx tsc",
+    "start": "npm run build && node build/app.js",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matheushpitz/wallet-tracker.git"
+  },
+  "author": "Matheus Henrique Pitz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matheushpitz/wallet-tracker/issues"
+  },
+  "homepage": "https://github.com/matheushpitz/wallet-tracker#readme",
+  "devDependencies": {
+    "@types/node": "^18.0.1",
+    "nodemon": "^2.0.18",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4"
+  }
+}
