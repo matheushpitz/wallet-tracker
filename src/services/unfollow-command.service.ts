@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { IDiscordCommand, IDiscordCommandListener, IDiscordMessageData } from "../integrations/discord.integration";
+import { Wallet } from "../models/wallet.model";
 
 export class UnfollowCommandService implements IDiscordCommandListener {
 
@@ -23,6 +24,22 @@ export class UnfollowCommandService implements IDiscordCommandListener {
     }
 
     async onExecute(interaction: any, options: { [key: string]: any; }, messageData: IDiscordMessageData): Promise<void> {
-        await interaction.reply(` identifier: ${options.identifier} channelId: ${messageData.channelId} userId: ${messageData.userId}`);
+        const { channelId, userId } = messageData;
+        const { identifier } = options;
+
+        await interaction.deferReply();
+
+        let result = await Wallet.findByIdentifierAndChannel(identifier, channelId);
+        if(!result.length) {
+            await interaction.editReply(`No subscription found for "${identifier}"`);
+            return;
+        }
+
+        try {
+            await Wallet.deleteMany({ _id: { $in: result.map(x => x._id) } });
+            await interaction.editReply(`Successfully unsubscribed`);
+        } catch(err) {
+            console.error('Error when trying to unsubscribe wallet', err);
+        }
     }
 }

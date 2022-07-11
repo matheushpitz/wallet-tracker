@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { IDiscordCommand, IDiscordCommandListener, IDiscordMessageData } from "../integrations/discord.integration";
+import { Wallet } from "../models/wallet.model";
 
 export class FollowCommandService implements IDiscordCommandListener {
 
@@ -25,6 +26,42 @@ export class FollowCommandService implements IDiscordCommandListener {
     }
 
     async onExecute(interaction: any, options: { [key: string]: any; }, messageData: IDiscordMessageData): Promise<void> {
-        await interaction.reply(` address: ${options.address} label: ${options.label} channelId: ${messageData.channelId} userId: ${messageData.userId}`);
+        const { channelId, userId } = messageData;
+        const { address, label } = options;
+
+        await interaction.deferReply();
+
+        if(address === label) {
+            await interaction.editReply('Address and label must be different');
+            return;
+        }
+
+        let result = await Wallet.findByAddressAndChannel(address, channelId);
+        if(result.length) {
+            await interaction.editReply('This channel is already subscribed to this address');
+            return;
+        }
+
+        if(label) {
+            result = await Wallet.findByLabelAndChannel(label, channelId);
+            if(result.length) {
+                await interaction.editReply(`The label ${label} already exists on this channel.`);
+                return;
+            }
+        }
+
+        const model = new Wallet({
+            address,
+            channelId,
+            createdBy: userId,
+            label
+        });
+
+        try {
+            await model.save();
+            await interaction.editReply(`Successfully subscribed to ${address}.`);
+        } catch(err) {
+            console.error('Error when trying to save wallet', err);
+        }
     }
 }
