@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { createAlchemy } from "./integrations/alchemy.integration";
 import { createClient } from "./integrations/discord.integration";
 import { FollowCommandService } from "./services/follow-command.service";
+import { ListenerService } from './services/listener.service';
 import { UnfollowCommandService } from './services/unfollow-command.service';
 
 config();
@@ -14,6 +15,8 @@ async function init() {
         FollowCommandService.getCommandObject(),
         UnfollowCommandService.getCommandObject()
     ]);
+
+    await ListenerService.startListener(alchemy, discordClient);
 
     console.log('Successfully Initialized');
 }

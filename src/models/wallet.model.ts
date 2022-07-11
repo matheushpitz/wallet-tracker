@@ -13,6 +13,7 @@ export interface IWalletModel extends Model<IWalletDocument> {
     findByLabelAndChannel(label: string, channelId: string): Promise<Array<IWalletDocument>>;
     findByIdentifierAndChannel(identifier: string, channelId: string): Promise<Array<IWalletDocument>>;
     findAllAddresses(): Promise<Array<IWalletDocument>>;
+    findChannelAndLabelByAddress(address: string): Promise<Array<IWalletDocument>>;
 }
 
 const walletSchema = new mongoose.Schema({
@@ -37,6 +38,10 @@ walletSchema.statics.findByIdentifierAndChannel = function(identifier: string, c
 
 walletSchema.statics.findAllAddresses = function() {
     return this.find().select({ address: 1 });
+}
+
+walletSchema.statics.findChannelAndLabelByAddress = function(address: string) {
+    return this.find({ address }).select({ channelId: 1, label: 1 });
 }
 
 export const Wallet = mongoose.model<IWalletDocument, IWalletModel>('Wallet', walletSchema);
